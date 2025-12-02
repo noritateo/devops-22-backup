@@ -1,47 +1,51 @@
 package com.napier.devops;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.*;
 
 public class AppTest
 {
     static App app;
 
-    @BeforeAll
-    static void init()
+    @BeforeClass
+    public static void init()
     {
         app = new App();
     }
 
-    /**
-     * Test displayAllCountries() handles null
-     */
+    /* ------------------------------------------------------------
+       outputCountries() Tests
+       ------------------------------------------------------------ */
+
     @Test
-    void displayAllCountries_nullList()
+    public void outputCountries_nullList()
     {
-        app.displayAllCountries(null);
+        try {
+            app.outputCountries(null, "Test_Null.md");
+        } catch (Exception e) {
+            fail("Should not throw exception");
+        }
     }
 
-    /**
-     * Test displayAllCountries() handles empty list
-     */
     @Test
-    void displayAllCountries_emptyList()
+    public void outputCountries_emptyList()
     {
-        List<Country> empty = new ArrayList<>();
-        app.displayAllCountries(empty);
+        try {
+            List<Country> empty = new ArrayList<>();
+            app.outputCountries(empty, "Test_Empty.md");
+        } catch (Exception e) {
+            fail("Should not throw exception");
+        }
     }
 
-    /**
-     * Test displayAllCountries() prints a single country
-     */
     @Test
-    void displayAllCountries_singleCountry()
+    public void outputCountries_singleCountry()
     {
         List<Country> list = new ArrayList<>();
 
@@ -55,16 +59,93 @@ public class AppTest
 
         list.add(c);
 
-        app.displayAllCountries(list);
+        String filename = "Test_Single.md";
+        app.outputCountries(list, filename);
+
+        File file = new File("./reports/" + filename);
+        assertTrue("Report file should exist", file.exists());
     }
 
-    /**
-     * Test getAllCountries() always returns a non-null list.
-     */
+    /* ------------------------------------------------------------
+       getAllCountries() Basic Test
+       ------------------------------------------------------------ */
+
     @Test
-    void getAllCountries_returnsList()
+    public void getAllCountries_returnsList()
     {
-        List<Country> countries = app.getAllCountries();
-        assertNotNull(countries, "List should never be null");
+        List<Country> list = app.getAllCountries();
+        assertNotNull("List should never be null", list);
+    }
+
+    /* ------------------------------------------------------------
+       outputCities() Tests
+       ------------------------------------------------------------ */
+
+    @Test
+    public void outputCities_nullList()
+    {
+        try {
+            app.outputCities(null, "Cities_Null.md");
+        } catch (Exception e) {
+            fail("Should not throw exception");
+        }
+    }
+
+    @Test
+    public void outputCities_emptyList()
+    {
+        try {
+            List<City> empty = new ArrayList<>();
+            app.outputCities(empty, "Cities_Empty.md");
+        } catch (Exception e) {
+            fail("Should not throw exception");
+        }
+    }
+
+    @Test
+    public void outputCities_singleCity()
+    {
+        List<City> list = new ArrayList<>();
+
+        City city = new City(
+                "Singapore",
+                "Singapore",
+                "Central",
+                "Southeast Asia",
+                "Asia",
+                5703600
+        );
+        list.add(city);
+
+        String filename = "Cities_Single.md";
+        app.outputCities(list, filename);
+
+        File f = new File("./reports/" + filename);
+        assertTrue("City report should exist", f.exists());
+    }
+
+    /* ------------------------------------------------------------
+       outputCapitalCities() Tests
+       ------------------------------------------------------------ */
+
+    @Test
+    public void outputCapitalCities_nullList()
+    {
+        try {
+            app.outputCapitalCities(null, "Capitals_Null.md");
+        } catch (Exception e) {
+            fail("Should not throw exception");
+        }
+    }
+
+    @Test
+    public void outputCapitalCities_emptyList()
+    {
+        try {
+            List<City> empty = new ArrayList<>();
+            app.outputCapitalCities(empty, "Capitals_Empty.md");
+        } catch (Exception e) {
+            fail("Should not throw exception");
+        }
     }
 }
