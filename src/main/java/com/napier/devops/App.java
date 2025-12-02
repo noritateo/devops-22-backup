@@ -6,44 +6,49 @@ import java.util.List;
 
 public class App
 {
-
     private Connection con = null;
-    private Display display = new Display();
 
-    // connect to mysql
-    public void connect(String location, int delay) {
-        try {
-            // Load Database driver
+    // -------------------------------------------------------------------------
+    // DB CONNECTION
+    // -------------------------------------------------------------------------
+    public void connect(String location, int delay)
+    {
+        try
+        {
             Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
+        }
+        catch (ClassNotFoundException e)
+        {
             System.out.println("Could not load SQL driver");
             System.exit(-1);
         }
 
         int retries = 10;
-        for (int i = 0; i < retries; ++i) {
+        for (int i = 0; i < retries; ++i)
+        {
             System.out.println("Connecting to database...");
-            try {
-                // Wait a bit for db to start
+            try
+            {
                 Thread.sleep(delay);
-                // Connect to database
                 con = DriverManager.getConnection(
                         "jdbc:mysql://" + location + "/world?allowPublicKeyRetrieval=true&useSSL=false",
                         "root",
                         "example");
                 System.out.println("Successfully connected");
                 break;
-            } catch (SQLException sqle) {
+            }
+            catch (SQLException sqle)
+            {
                 System.out.println("Failed to connect to database attempt " + i);
                 System.out.println(sqle.getMessage());
-            } catch (InterruptedException ie) {
+            }
+            catch (InterruptedException ie)
+            {
                 System.out.println("Thread interrupted? Should not happen.");
             }
         }
     }
 
-
-    // disconnect from mysql
     public void disconnect()
     {
         if (con != null)
@@ -59,30 +64,40 @@ public class App
         }
     }
 
-    // get all countries details
+    // -------------------------------------------------------------------------
+    // QUERIES
+    // -------------------------------------------------------------------------
+
+    /** All countries ordered by population (desc). */
     public List<Country> getAllCountries()
     {
         List<Country> countries = new ArrayList<>();
+
+        if (con == null)
+        {
+            System.out.println("No database connection. Returning empty country list.");
+            return countries;
+        }
 
         try
         {
             Statement stmt = con.createStatement();
             String query =
-                    "SELECT country.Code, country.Name, country.Continent, country.Region, " +
-                            "country.Population, city.Name AS CapitalCity " +
-                            "FROM country " +
-                            "LEFT JOIN city ON country.Capital = city.ID " +
-                            "ORDER BY country.Population DESC";
+                    "SELECT c.Code, c.Name, c.Continent, c.Region, c.Population, " +
+                            "       ci.Name AS CapitalCity " +
+                            "FROM country c " +
+                            "LEFT JOIN city ci ON c.Capital = ci.ID " +
+                            "ORDER BY c.Population DESC";
 
             ResultSet rset = stmt.executeQuery(query);
 
             while (rset.next())
             {
                 Country c = new Country();
-                c.code = rset.getString("Code");
-                c.name = rset.getString("Name");
-                c.continent = rset.getString("Continent");
-                c.region = rset.getString("Region");
+                c.code       = rset.getString("Code");
+                c.name       = rset.getString("Name");
+                c.continent  = rset.getString("Continent");
+                c.region     = rset.getString("Region");
                 c.population = rset.getInt("Population");
                 c.capitalCity = rset.getString("CapitalCity");
                 countries.add(c);
@@ -97,65 +112,35 @@ public class App
         return countries;
     }
 
-    // World
-    public ArrayList<City> top10populatedCities() {
-        ArrayList<City> cities = new ArrayList<City>();
+    /** All cities in the world ordered by population (desc). */
+    public List<City> getAllCities()
+    {
+        List<City> cities = new ArrayList<>();
 
-        try {
-            Statement stmt = con.createStatement();
-            String sql =
-                    "SELECT city.Name AS CityName, " +
-                            "       country.Name AS CountryName, " +
-                            "       city.District, " +
-                            "       country.Region, " +
-                            "       country.Continent, " +
-                            "       city.Population " +
-                            "FROM city " +
-                            "JOIN country ON city.CountryCode = country.Code " +
-                            "ORDER BY city.Population DESC " +
-                            "LIMIT 10;";
-
-            ResultSet resultSet = stmt.executeQuery(sql);
-
-            while (resultSet.next()) {
-                City city = new City(
-                        resultSet.getString("CityName"),     // Set city name
-                        resultSet.getString("CountryName"),  // Set country name
-                        resultSet.getString("District"),     // Set district
-                        resultSet.getString("Region"),       // Set region
-                        resultSet.getString("Continent"),    // Set continent
-                        resultSet.getInt("Population")       // Set population
-                );
-                cities.add(city);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        if (con == null)
+        {
+            System.out.println("No database connection. Returning empty city list.");
+            return cities;
         }
-        return cities;
-    }
 
-    // Continent
-    public ArrayList<City> top10populatedCitiesAsia() {
-        ArrayList<City> cities = new ArrayList<City>();
-
-        try {
+        try
+        {
             Statement stmt = con.createStatement();
             String sql =
-                    "SELECT city.Name AS CityName, " +
-                            "       country.Name AS CountryName, " +
-                            "       city.District, " +
-                            "       country.Region, " +
-                            "       country.Continent, " +
-                            "       city.Population " +
-                            "FROM city " +
-                            "JOIN country ON city.CountryCode = country.Code " +
-                            "WHERE country.Continent = 'Asia' " +
-                            "ORDER BY city.Population DESC " +
-                            "LIMIT 10;";
+                    "SELECT ci.Name AS CityName, " +
+                            "       co.Name AS CountryName, " +
+                            "       ci.District, " +
+                            "       co.Region, " +
+                            "       co.Continent, " +
+                            "       ci.Population " +
+                            "FROM city ci " +
+                            "JOIN country co ON ci.CountryCode = co.Code " +
+                            "ORDER BY ci.Population DESC";
 
             ResultSet resultSet = stmt.executeQuery(sql);
 
-            while (resultSet.next()) {
+            while (resultSet.next())
+            {
                 City city = new City(
                         resultSet.getString("CityName"),
                         resultSet.getString("CountryName"),
@@ -166,142 +151,45 @@ public class App
                 );
                 cities.add(city);
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
+        catch (SQLException e)
+        {
+            System.out.println("Failed to get city details");
+            System.out.println(e.getMessage());
+        }
+
         return cities;
     }
 
-    // Region
-    public ArrayList<City> top10populatedCitiesCaribbean() {
-        ArrayList<City> cities = new ArrayList<City>();
+    /** All capital cities ordered by population (desc). */
+    public List<City> getAllCapitalCities()
+    {
+        List<City> capitals = new ArrayList<>();
 
-        try {
-            Statement stmt = con.createStatement();
-            String sql =
-                    "SELECT city.Name AS CityName, " +
-                            "       country.Name AS CountryName, " +
-                            "       city.District, " +
-                            "       country.Region, " +
-                            "       country.Continent, " +
-                            "       city.Population " +
-                            "FROM city " +
-                            "JOIN country ON city.CountryCode = country.Code " +
-                            "WHERE country.Region = 'Caribbean' " +
-                            "ORDER BY city.Population DESC " +
-                            "LIMIT 10;";
-
-            ResultSet resultSet = stmt.executeQuery(sql);
-
-            while (resultSet.next()) {
-                City city = new City(
-                        resultSet.getString("CityName"),
-                        resultSet.getString("CountryName"),
-                        resultSet.getString("District"),
-                        resultSet.getString("Region"),
-                        resultSet.getString("Continent"),
-                        resultSet.getInt("Population")
-                );
-                cities.add(city);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        if (con == null)
+        {
+            System.out.println("No database connection. Returning empty capital city list.");
+            return capitals;
         }
-        return cities;
-    }
 
-    // Country
-    public ArrayList<City> top10populatedCitiesMyanmar() {
-        ArrayList<City> cities = new ArrayList<City>();
-
-        try {
+        try
+        {
             Statement stmt = con.createStatement();
             String sql =
-                    "SELECT city.Name AS CityName, " +
-                            "       country.Name AS CountryName, " +
-                            "       city.District, " +
-                            "       country.Region, " +
-                            "       country.Continent, " +
-                            "       city.Population " +
-                            "FROM city " +
-                            "JOIN country ON city.CountryCode = country.Code " +
-                            "WHERE country.Name = 'Myanmar' " +
-                            "ORDER BY city.Population DESC " +
-                            "LIMIT 10;";
-
-            ResultSet resultSet = stmt.executeQuery(sql);
-
-            while (resultSet.next()) {
-                City city = new City(
-                        resultSet.getString("CityName"),
-                        resultSet.getString("CountryName"),
-                        resultSet.getString("District"),
-                        resultSet.getString("Region"),
-                        resultSet.getString("Continent"),
-                        resultSet.getInt("Population")
-                );
-                cities.add(city);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return cities;
-    }
-
-    // District
-    public ArrayList<City> top10populatedCitiesQueensland() {
-        ArrayList<City> cities = new ArrayList<City>();
-
-        try {
-            Statement stmt = con.createStatement();
-            String sql =
-                    "SELECT city.Name AS CityName, " +
-                            "       country.Name AS CountryName, " +
-                            "       city.District, " +
-                            "       country.Region, " +
-                            "       country.Continent, " +
-                            "       city.Population " +
-                            "FROM city " +
-                            "JOIN country ON city.CountryCode = country.Code " +
-                            "WHERE city.District = 'Queensland' " +
-                            "ORDER BY city.Population DESC " +
-                            "LIMIT 10;";
-
-            ResultSet resultSet = stmt.executeQuery(sql);
-
-            while (resultSet.next()) {
-                City city = new City(
-                        resultSet.getString("CityName"),
-                        resultSet.getString("CountryName"),
-                        resultSet.getString("District"),
-                        resultSet.getString("Region"),
-                        resultSet.getString("Continent"),
-                        resultSet.getInt("Population")
-                );
-                cities.add(city);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return cities;
-    }
-
-    // Capital City World
-    public ArrayList<City> capitalCitiesWorld() {
-        ArrayList<City> captialCities = new ArrayList<City>();
-
-        try {
-            Statement stmt = con.createStatement();
-            String sql =
-                    "SELECT ci.Name AS CityName, co.Name AS CountryName, ci.District, " +
-                            "co.Region, co.Continent, ci.Population " +
+                    "SELECT ci.Name AS CityName, " +
+                            "       co.Name AS CountryName, " +
+                            "       ci.District, " +
+                            "       co.Region, " +
+                            "       co.Continent, " +
+                            "       ci.Population " +
                             "FROM city ci " +
                             "JOIN country co ON ci.ID = co.Capital " +
-                            "ORDER BY ci.Population DESC;";
+                            "ORDER BY ci.Population DESC";
 
             ResultSet resultSet = stmt.executeQuery(sql);
 
-            while (resultSet.next()) {
+            while (resultSet.next())
+            {
                 City capitalCity = new City(
                         resultSet.getString("CityName"),
                         resultSet.getString("CountryName"),
@@ -310,342 +198,22 @@ public class App
                         resultSet.getString("Continent"),
                         resultSet.getInt("Population")
                 );
-                captialCities.add(capitalCity);
+                capitals.add(capitalCity);
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
-        return captialCities;
-    }
-
-    // Capital City Asia
-    public ArrayList<City> capitalCitiesAsia() {
-        ArrayList<City> captialCities = new ArrayList<City>();
-
-        try {
-            Statement stmt = con.createStatement();
-            String sql =
-                    "SELECT ci.Name AS CityName, co.Name AS CountryName, ci.District, " +
-                            "       co.Region, co.Continent, ci.Population " +
-                            "FROM city ci " +
-                            "JOIN country co ON ci.ID = co.Capital " +
-                            "WHERE co.Continent = 'Asia' " +
-                            "ORDER BY ci.Population DESC;";
-
-            ResultSet resultSet = stmt.executeQuery(sql);
-
-            while (resultSet.next()) {
-                City capitalCity = new City(
-                        resultSet.getString("CityName"),
-                        resultSet.getString("CountryName"),
-                        resultSet.getString("District"),
-                        resultSet.getString("Region"),
-                        resultSet.getString("Continent"),
-                        resultSet.getInt("Population")
-                );
-                captialCities.add(capitalCity);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return captialCities;
-    }
-
-    // Capital City Region
-    public ArrayList<City> capitalCitiesCaribbean() {
-        ArrayList<City> captialCities = new ArrayList<City>();
-
-        try {
-            Statement stmt = con.createStatement();
-            String sql =
-                    "SELECT ci.Name AS CityName, co.Name AS CountryName, ci.District, " +
-                            "       co.Region, co.Continent, ci.Population " +
-                            "FROM city ci " +
-                            "JOIN country co ON ci.ID = co.Capital " +
-                            "WHERE co.Region = 'Caribbean' " +
-                            "ORDER BY ci.Population DESC;";
-
-            ResultSet resultSet = stmt.executeQuery(sql);
-
-            while (resultSet.next()) {
-                City capitalCity = new City(
-                        resultSet.getString("CityName"),
-                        resultSet.getString("CountryName"),
-                        resultSet.getString("District"),
-                        resultSet.getString("Region"),
-                        resultSet.getString("Continent"),
-                        resultSet.getInt("Population")
-                );
-                captialCities.add(capitalCity);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return captialCities;
-    }
-
-    // Top 10 Capital Cities World
-    public ArrayList<City> top10CapitalCitiesWorld() {
-        ArrayList<City> captialCities = new ArrayList<City>();
-
-        try {
-            Statement stmt = con.createStatement();
-            String sql =
-                    "SELECT ci.Name AS CityName, co.Name AS CountryName, ci.District, " +
-                            "       co.Region, co.Continent, ci.Population " +
-                            "FROM city ci " +
-                            "JOIN country co ON ci.ID = co.Capital " +
-                            "ORDER BY ci.Population DESC " +
-                            "LIMIT 10;";
-
-            ResultSet resultSet = stmt.executeQuery(sql);
-
-            while (resultSet.next()) {
-                City capitalCity = new City(
-                        resultSet.getString("CityName"),
-                        resultSet.getString("CountryName"),
-                        resultSet.getString("District"),
-                        resultSet.getString("Region"),
-                        resultSet.getString("Continent"),
-                        resultSet.getInt("Population")
-                );
-                captialCities.add(capitalCity);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return captialCities;
-    }
-
-    // Top 10 Capital City Continent
-    public ArrayList<City> top10capitalCitiesAsia() {
-        ArrayList<City> captialCities = new ArrayList<City>();
-
-        try {
-            Statement stmt = con.createStatement();
-            String sql =
-                    "SELECT ci.Name AS CityName, co.Name AS CountryName, ci.District, " +
-                            "       co.Region, co.Continent, ci.Population " +
-                            "FROM city ci " +
-                            "JOIN country co ON ci.ID = co.Capital " +
-                            "WHERE co.Region = 'Caribbean' " +
-                            "ORDER BY ci.Population DESC " +
-                            "LIMIT 10;";
-
-            ResultSet resultSet = stmt.executeQuery(sql);
-
-            while (resultSet.next()) {
-                City capitalCity = new City(
-                        resultSet.getString("CityName"),
-                        resultSet.getString("CountryName"),
-                        resultSet.getString("District"),
-                        resultSet.getString("Region"),
-                        resultSet.getString("Continent"),
-                        resultSet.getInt("Population")
-                );
-                captialCities.add(capitalCity);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return captialCities;
-    }
-
-    // Top 10 Capital City Region
-    public ArrayList<City> top10CapitalCitiesCaribbean() {
-        ArrayList<City> captialCities = new ArrayList<City>();
-
-        try {
-            Statement stmt = con.createStatement();
-            String sql =
-                    "SELECT ci.Name AS CityName, co.Name AS CountryName, ci.District, " +
-                            "       co.Region, co.Continent, ci.Population " +
-                            "FROM city ci " +
-                            "JOIN country co ON ci.ID = co.Capital " +
-                            "WHERE co.Region = 'Caribbean' " +
-                            "ORDER BY ci.Population DESC;";
-
-            ResultSet resultSet = stmt.executeQuery(sql);
-
-            while (resultSet.next()) {
-                City capitalCity = new City(
-                        resultSet.getString("CityName"),
-                        resultSet.getString("CountryName"),
-                        resultSet.getString("District"),
-                        resultSet.getString("Region"),
-                        resultSet.getString("Continent"),
-                        resultSet.getInt("Population")
-                );
-                captialCities.add(capitalCity);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return captialCities;
-    }
-
-    // World Population
-    public ArrayList<PeoplePopulation> worldPopulation() {
-        ArrayList<PeoplePopulation> population = new ArrayList<>();
-
-        try {
-            Statement stmt = con.createStatement();
-            String sql = "SELECT SUM(Population) AS WorldPopulation FROM country;";
-
-            ResultSet resultSet = stmt.executeQuery(sql);
-
-            if (resultSet.next()) {
-                long total = resultSet.getLong("WorldPopulation");
-                PeoplePopulation peoplePopulation = new PeoplePopulation("World", total);
-                population.add(peoplePopulation);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return population;
-    }
-
-    // Asian Continent Population
-    public ArrayList<PeoplePopulation> asiaPopulation() {
-        ArrayList<PeoplePopulation> population = new ArrayList<>();
-
-        try {
-            Statement stmt = con.createStatement();
-
-            String sql = "SELECT Continent, SUM(Population) AS TotalPopulation " +
-                    "FROM country " +
-                    "WHERE Continent = 'Asia' " +
-                    "GROUP BY Continent;";
-
-            ResultSet resultSet = stmt.executeQuery(sql);
-
-            while (resultSet.next()) {
-                String continentName = resultSet.getString("Continent");
-                long totalPopulation = resultSet.getLong("TotalPopulation");
-
-                PeoplePopulation peoplePopulation = new PeoplePopulation(continentName, totalPopulation);
-                population.add(peoplePopulation);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        catch (SQLException e)
+        {
+            System.out.println("Failed to get capital city details");
+            System.out.println(e.getMessage());
         }
 
-        return population;
+        return capitals;
     }
 
-    // Caribbean Region Population
-    public ArrayList<PeoplePopulation> regionPopulation() {
-        ArrayList<PeoplePopulation> population = new ArrayList<>();
+    // -------------------------------------------------------------------------
+    // DISPLAY HELPERS (replace old Display class)
+    // -------------------------------------------------------------------------
 
-        try {
-            Statement stmt = con.createStatement();
-
-            String sql = "SELECT Region, SUM(Population) AS TotalPopulation " +
-                    "FROM country " +
-                    "WHERE Region = 'Caribbean' " +
-                    "GROUP BY Region;";
-
-            ResultSet resultSet = stmt.executeQuery(sql);
-
-            while (resultSet.next()) {
-                String regionName = resultSet.getString("Region");
-                long totalPopulation = resultSet.getLong("TotalPopulation");
-
-                PeoplePopulation peoplePopulation = new PeoplePopulation(regionName, totalPopulation);
-                population.add(peoplePopulation);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        return population;
-    }
-
-    // Myanmar Country Population
-    public ArrayList<PeoplePopulation> countryPopulation() {
-        ArrayList<PeoplePopulation> population = new ArrayList<>();
-
-        try {
-            Statement stmt = con.createStatement();
-
-            String sql = "SELECT Name AS CountryName, Population AS TotalPopulation " +
-                    "FROM country " +
-                    "WHERE Name = 'Myanmar';";
-
-            ResultSet resultSet = stmt.executeQuery(sql);
-
-            // Process each record
-            while (resultSet.next()) {
-                String countryName = resultSet.getString("CountryName");
-                long totalPopulation = resultSet.getLong("TotalPopulation");
-                PeoplePopulation peoplePopulation = new PeoplePopulation(countryName, totalPopulation);
-                population.add(peoplePopulation);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        return population;
-    }
-
-    // Queensland District Population
-    public ArrayList<PeoplePopulation> distinctPopulation() {
-        ArrayList<PeoplePopulation> population = new ArrayList<>();
-
-        try {
-            Statement stmt = con.createStatement();
-
-            String sql = "SELECT ci.District AS District, " +
-                    "SUM(ci.Population) AS totalPopulation " +
-                    "FROM city ci " +
-                    "WHERE ci.District = 'Queensland' " +
-                    "GROUP BY ci.CountryCode, ci.District " +
-                    "ORDER BY ci.CountryCode, ci.District;";
-
-            ResultSet resultSet = stmt.executeQuery(sql);
-
-            while (resultSet.next()) {
-                String districtName = resultSet.getString("District");
-                long totalPopulation = resultSet.getLong("totalPopulation");
-                PeoplePopulation peoplePopulation = new PeoplePopulation(districtName, totalPopulation);
-                population.add(peoplePopulation);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        return population;
-    }
-
-    // Yangon City Population
-    public ArrayList<PeoplePopulation> cityPopulation() {
-        ArrayList<PeoplePopulation> population = new ArrayList<>();
-
-        try {
-            Statement stmt = con.createStatement();
-
-            String sql = "SELECT ci.Name AS CityName, " +
-                    "SUM(ci.Population) AS totalPopulation " +
-                    "FROM city ci " +
-                    "WHERE ci.Name = 'Yangon' " +
-                    "GROUP BY ci.Name;";
-
-            ResultSet resultSet = stmt.executeQuery(sql);
-
-            while (resultSet.next()) {
-                String cityName = resultSet.getString("CityName");
-                long totalPopulation = resultSet.getLong("totalPopulation");
-                PeoplePopulation peoplePopulation = new PeoplePopulation(cityName, totalPopulation);
-                population.add(peoplePopulation);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        return population;
-    }
-
-    // display info from getAllCountries
     public void displayAllCountries(List<Country> countries)
     {
         if (countries == null || countries.isEmpty())
@@ -654,116 +222,70 @@ public class App
             return;
         }
 
-        System.out.println(String.format(
-                "%-5s %-55s %-20s %-25s %-15s %-25s",
-                "Code", "Name", "Continent", "Region", "Population", "Capital City"));
+        System.out.printf(
+                "%-5s %-55s %-20s %-25s %-15s %-25s%n",
+                "Code", "Name", "Continent", "Region", "Population", "Capital City");
 
         for (Country c : countries)
         {
-            String line = String.format(
-                    "%-5s %-55s %-20s %-25s %-15d %-25s",
+            System.out.printf(
+                    "%-5s %-55s %-20s %-25s %-15d %-25s%n",
                     c.code, c.name, c.continent, c.region, c.population, c.capitalCity);
-            System.out.println(line);
         }
     }
 
-    public ArrayList<CountryLanguage> getWorldLanguageReport() {
-        ArrayList<CountryLanguage> languages = new ArrayList<>();
-
-        if (con == null) {
-            return languages;
+    public void displayAllCities(List<City> cities)
+    {
+        if (cities == null || cities.isEmpty())
+        {
+            System.out.println("No cities found.");
+            return;
         }
 
-        try {
-            Statement stmt = con.createStatement();
+        System.out.printf(
+                "%-35s %-40s %-25s %-25s %-15s %-15s%n",
+                "City", "Country", "District", "Region", "Continent", "Population");
 
-            String sql = "SELECT " +
-                    "cl.Language AS language, " +
-                    "ROUND(SUM(ROUND(c.Population * (cl.Percentage / 100))), 0) AS totalSpeakers, " +
-                    "ROUND(SUM(ROUND(c.Population * (cl.Percentage / 100))) / " +
-                    "(SELECT SUM(Population) FROM country) * 100, 2) AS worldPercentage " +
-                    "FROM countrylanguage cl " +
-                    "JOIN country c ON cl.CountryCode = c.Code " +
-                    "WHERE cl.Language IN ('Chinese', 'English', 'Hindi', 'Spanish', 'Arabic') " +
-                    "GROUP BY cl.Language " +
-                    "ORDER BY totalSpeakers DESC";
-            ResultSet rset = stmt.executeQuery(sql);
-
-            while (rset.next()) {
-                CountryLanguage cl = new CountryLanguage(
-                        rset.getString("language"),
-                        rset.getDouble("totalSpeakers"),
-                        rset.getDouble("worldPercentage")
-                );
-
-                languages.add(cl);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        for (City ci : cities)
+        {
+            System.out.printf(
+                    "%-35s %-40s %-25s %-25s %-15s %-15d%n",
+                    ci.name, ci.countryName, ci.district, ci.region, ci.continent, ci.population);
         }
-
-        // Return the list of languages with calculated statistics
-        return languages;
     }
+
+    // -------------------------------------------------------------------------
+    // MAIN
+    // -------------------------------------------------------------------------
 
     public static void main(String[] args)
     {
         App a = new App();
-        Display display = new Display();
 
-        // If no arguments, default to local debugging on 33060
-        if (args.length < 2) {
+        // Default for local debugging (Docker mapping to 33060)
+        if (args.length < 2)
+        {
             a.connect("localhost:33060", 30000);
-        } else {
+        }
+        else
+        {
             a.connect(args[0], Integer.parseInt(args[1]));
         }
 
-        // Countries
+        // 1. All countries
         List<Country> countries = a.getAllCountries();
         a.displayAllCountries(countries);
-
-        // Cities
-        display.displayAllCities(a.top10populatedCities());
-        System.out.println();
-        display.displayAllCities(a.top10populatedCitiesAsia());
-        System.out.println();
-        display.displayAllCities(a.top10populatedCitiesCaribbean());
-        System.out.println();
-        display.displayAllCities(a.top10populatedCitiesMyanmar());
-        System.out.println();
-        display.displayAllCities(a.top10populatedCitiesQueensland());
         System.out.println();
 
-        // Capital Cities
-        display.displayAllCities(a.capitalCitiesWorld());
-        System.out.println();
-        display.displayAllCities(a.capitalCitiesAsia());
-        System.out.println();
-        display.displayAllCities(a.capitalCitiesCaribbean());
+        // 2. All cities
+        List<City> cities = a.getAllCities();
+        a.displayAllCities(cities);
         System.out.println();
 
-        // Top Capital Cities
-        display.displayAllCities(a.top10CapitalCitiesWorld());
+        // 3. All capital cities
+        List<City> capitalCities = a.getAllCapitalCities();
+        a.displayAllCities(capitalCities);
         System.out.println();
-        display.displayAllCities(a.top10capitalCitiesAsia());
-        System.out.println();
-        display.displayAllCities(a.top10CapitalCitiesCaribbean());
-        System.out.println();
-
-        display.displayAllPeoplePopulation(a.worldPopulation());
-        System.out.println();
-        display.displayAllPeoplePopulation(a.asiaPopulation());
-        System.out.println();
-        display.displayAllPeoplePopulation(a.regionPopulation());
-        System.out.println();
-        display.displayAllPeoplePopulation(a.countryPopulation());
-        System.out.println();
-        display.displayAllPeoplePopulation(a.distinctPopulation());
-        System.out.println();
-        display.displayAllPeoplePopulation(a.cityPopulation());
-        System.out.println();
-
-        display.displaylanguages(a.getWorldLanguageReport());
 
         a.disconnect();
     }

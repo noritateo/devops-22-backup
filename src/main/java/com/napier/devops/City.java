@@ -1,55 +1,28 @@
 package com.napier.devops;
 
-public class City {
-
-    // City name
+public class City
+{
     public String name;
-
-    // Country code
-    public String countryCode;
-
-    // District
+    public String countryName;
     public String district;
-
-    // Region
     public String region;
-
-    // Continent
     public String continent;
-
-    // Population
     public int population;
 
-    public City(String name, String countryCode, String district, String region, String continent, int population) {
+    public City() {}
+
+    public City(String name,
+                String countryName,
+                String district,
+                String region,
+                String continent,
+                int population)
+    {
         this.name = name;
-        this.countryCode = countryCode;
+        this.countryName = countryName;
         this.district = district;
         this.region = region;
         this.continent = continent;
         this.population = population;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getCountryCode() {
-        return countryCode;
-    }
-
-    public String getDistrict() {
-        return district;
-    }
-
-    public String getRegion() {
-        return region;
-    }
-
-    public String getContinent() {
-        return continent;
-    }
-
-    public int getPopulation() {
-        return population;
     }
 }
