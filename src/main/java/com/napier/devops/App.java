@@ -1,5 +1,6 @@
 package com.napier.devops;
 
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -908,21 +909,12 @@ public class App
     {
         try
         {
-            new File("./reports/").mkdirs();
-
-            BufferedWriter w = new BufferedWriter(
-                    new FileWriter("./reports/" + filename));
-
-            w.write("| Code | Name | Continent | Region | Population | Capital City |\n");
-            w.write("| --- | --- | --- | --- | --- | --- |\n");
-
-            for (Country c : list)
-            {
-                if (c == null) continue;
-                w.write("| " + c.code + " | " + c.name + " | " + c.continent + " | " +
-                        c.region + " | " + c.population + " | " +
-                        (c.capitalCity == null ? "" : c.capitalCity) + " |\n");
+            File dir = new File("./reports/");
+            if (!dir.exists() && !dir.mkdirs()) {
+                System.out.println("Warning: Could not create reports directory.");
             }
+
+            BufferedWriter w = getBufferedWriter(list, filename);
 
             w.close();
             System.out.println("Created report: " + filename);
@@ -933,11 +925,31 @@ public class App
         }
     }
 
+    private static BufferedWriter getBufferedWriter(List<Country> list, String filename) throws IOException {
+        BufferedWriter w = new BufferedWriter(
+                new FileWriter("./reports/" + filename));
+
+        w.write("| Code | Name | Continent | Region | Population | Capital City |\n");
+        w.write("| --- | --- | --- | --- | --- | --- |\n");
+
+        for (Country c : list)
+        {
+            if (c == null) continue;
+            w.write("| " + c.code + " | " + c.name + " | " + c.continent + " | " +
+                    c.region + " | " + c.population + " | " +
+                    (c.capitalCity == null ? "" : c.capitalCity) + " |\n");
+        }
+        return w;
+    }
+
     public void outputCities(List<City> list, String filename)
     {
         try
         {
-            new File("./reports/").mkdirs();
+            File dir = new File("./reports/");
+            if (!dir.exists() && !dir.mkdirs()) {
+                System.out.println("Warning: Could not create reports directory.");
+            }
 
             BufferedWriter w = new BufferedWriter(
                     new FileWriter("./reports/" + filename));
@@ -964,7 +976,10 @@ public class App
     {
         try
         {
-            new File("./reports/").mkdirs();
+            File dir = new File("./reports/");
+            if (!dir.exists() && !dir.mkdirs()) {
+                System.out.println("Warning: Could not create reports directory.");
+            }
 
             BufferedWriter w = new BufferedWriter(
                     new FileWriter("./reports/" + filename));
