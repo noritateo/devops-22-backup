@@ -1208,6 +1208,9 @@ public class App
     {
         try
         {
+            if (list == null)
+                list = new ArrayList<>();
+
             File dir = new File("./reports/");
             if (!dir.exists() && !dir.mkdirs()) {
                 System.out.println("Warning: Could not create reports directory.");
@@ -1223,6 +1226,7 @@ public class App
             System.out.println("Failed writing " + filename);
         }
     }
+
 
     private static BufferedWriter getBufferedWriter(List<Country> list, String filename) throws IOException {
         BufferedWriter w = new BufferedWriter(
@@ -1245,6 +1249,9 @@ public class App
     {
         try
         {
+            if (list == null)
+                list = new ArrayList<>();
+
             File dir = new File("./reports/");
             if (!dir.exists() && !dir.mkdirs()) {
                 System.out.println("Warning: Could not create reports directory.");
@@ -1275,6 +1282,9 @@ public class App
     {
         try
         {
+            if (list == null)
+                list = new ArrayList<>();
+
             File dir = new File("./reports/");
             if (!dir.exists() && !dir.mkdirs()) {
                 System.out.println("Warning: Could not create reports directory.");
@@ -1375,6 +1385,30 @@ public class App
         }
     }
 
+    public void outputSingleValueReport(String description, long value, String filename)
+    {
+        try
+        {
+            File dir = new File("./reports/");
+            if (!dir.exists() && !dir.mkdirs()) {
+                System.out.println("Warning: Could not create reports directory.");
+            }
+
+            BufferedWriter w = new BufferedWriter(
+                    new FileWriter("./reports/" + filename));
+
+            w.write("| Description | Value |\n");
+            w.write("| --- | --- |\n");
+            w.write("| " + description + " | " + value + " |\n");
+
+            w.close();
+            System.out.println("Created report: " + filename);
+        }
+        catch (Exception e)
+        {
+            System.out.println("Failed writing " + filename);
+        }
+    }
 
 
     /* ============================================================
@@ -1391,122 +1425,158 @@ public class App
             a.connect(args[0], Integer.parseInt(args[1]));
 
         /* Parameters for testing */
-        String continent = "Asia";
-        String region = "Eastern Asia";
-        String country = "China";
-        String district = "New York";
+        String continent = "Europe";
+        String region = "Western Europe";
+        String country = "United States";
+        String district = "California";
         int n = 10;
 
-        /* ------------------------------------------------------------
-                          COUNTRY REPORTS (6)
-           ------------------------------------------------------------ */
+/* ------------------------------------------------------------
+                  COUNTRY REPORTS (6)
+   ------------------------------------------------------------ */
 
         a.outputCountries(a.getAllCountries(),
-                "Countries_World_All.md");
+                "req01_countries_world_all.md");
 
         a.outputCountries(a.getCountriesByContinent(continent),
-                "Countries_Continent_" + continent + "_All.md");
+                "req02_countries_continent_europe_all.md");
 
         a.outputCountries(a.getCountriesByRegion(region),
-                "Countries_Region_" + region + "_All.md");
+                "req03_countries_region_western_europe_all.md");
 
         a.outputCountries(a.getTopNCountriesWorld(n),
-                "Countries_World_Top_" + n + ".md");
+                "req04_countries_world_top10.md");
 
         a.outputCountries(a.getTopNCountriesByContinent(continent, n),
-                "Countries_Continent_" + continent + "_Top_" + n + ".md");
+                "req05_countries_continent_europe_top10.md");
 
         a.outputCountries(a.getTopNCountriesByRegion(region, n),
-                "Countries_Region_" + region + "_Top_" + n + ".md");
+                "req06_countries_region_western_europe_top10.md");
 
 
-        /* ------------------------------------------------------------
-                          CITY REPORTS (10)
-           ------------------------------------------------------------ */
+/* ------------------------------------------------------------
+                  CITY REPORTS (10)
+   ------------------------------------------------------------ */
 
         a.outputCities(a.getAllCities(),
-                "Cities_World_All.md");
+                "req07_cities_world_all.md");
 
         a.outputCities(a.getCitiesByContinent(continent),
-                "Cities_Continent_" + continent + "_All.md");
+                "req08_cities_continent_europe_all.md");
 
         a.outputCities(a.getCitiesByRegion(region),
-                "Cities_Region_" + region + "_All.md");
+                "req09_cities_region_western_europe_all.md");
 
         a.outputCities(a.getCitiesByCountry(country),
-                "Cities_Country_" + country + "_All.md");
+                "req10_cities_country_united_states_all.md");
 
         a.outputCities(a.getCitiesByDistrict(district),
-                "Cities_District_" + district + "_All.md");
+                "req11_cities_district_california_all.md");
 
         a.outputCities(a.getTopNCitiesWorld(n),
-                "Cities_World_Top_" + n + ".md");
+                "req12_cities_world_top10.md");
 
         a.outputCities(a.getTopNCitiesByContinent(continent, n),
-                "Cities_Continent_" + continent + "_Top_" + n + ".md");
+                "req13_cities_continent_europe_top10.md");
 
         a.outputCities(a.getTopNCitiesByRegion(region, n),
-                "Cities_Region_" + region + "_Top_" + n + ".md");
+                "req14_cities_region_western_europe_top10.md");
 
         a.outputCities(a.getTopNCitiesByCountry(country, n),
-                "Cities_Country_" + country + "_Top_" + n + ".md");
+                "req15_cities_country_united_states_top10.md");
 
         a.outputCities(a.getTopNCitiesByDistrict(district, n),
-                "Cities_District_" + district + "_Top_" + n + ".md");
+                "req16_cities_district_california_top10.md");
 
 
-        /* ------------------------------------------------------------
-                        CAPITAL CITY REPORTS (6)
-           ------------------------------------------------------------ */
+/* ------------------------------------------------------------
+                CAPITAL CITY REPORTS (6)
+   ------------------------------------------------------------ */
 
         a.outputCapitalCities(a.getAllCapitalCities(),
-                "CapitalCities_World_All.md");
+                "req17_capitals_world_all.md");
 
         a.outputCapitalCities(a.getCapitalCitiesByContinent(continent),
-                "CapitalCities_Continent_" + continent + "_All.md");
+                "req18_capitals_continent_europe_all.md");
 
         a.outputCapitalCities(a.getCapitalCitiesByRegion(region),
-                "CapitalCities_Region_" + region + "_All.md");
+                "req19_capitals_region_western_europe_all.md");
 
         a.outputCapitalCities(a.getTopNCapitalCitiesWorld(n),
-                "CapitalCities_World_Top_" + n + ".md");
+                "req20_capitals_world_top10.md");
 
         a.outputCapitalCities(a.getTopNCapitalCitiesByContinent(continent, n),
-                "CapitalCities_Continent_" + continent + "_Top_" + n + ".md");
+                "req21_capitals_continent_europe_top10.md");
 
         a.outputCapitalCities(a.getTopNCapitalCitiesByRegion(region, n),
-                "CapitalCities_Region_" + region + "_Top_" + n + ".md");
+                "req22_capitals_region_western_europe_top10.md");
 
-                /* ------------------------------------------------------------
-                    POPULATION BREAKDOWN REPORTS
-           ------------------------------------------------------------ */
+
+/* ------------------------------------------------------------
+            POPULATION BREAKDOWN REPORTS (3)
+   ------------------------------------------------------------ */
 
         a.outputPopulationReports(a.getPopulationByContinent(),
-                "Population_Continent_All.md");
+                "req23_population_continent_all.md");
 
         a.outputPopulationReports(a.getPopulationByRegion(),
-                "Population_Region_All.md");
+                "req24_population_region_all.md");
 
         a.outputPopulationReports(a.getPopulationByCountry(),
-                "Population_Country_All.md");
+                "req25_population_country_all.md");
 
-        /* ------------------------------------------------------------
-                        LANGUAGE REPORT
-           ------------------------------------------------------------ */
+
+/* ------------------------------------------------------------
+                  LANGUAGE REPORT (1)
+   ------------------------------------------------------------ */
 
         a.outputLanguageReport(a.getLanguageReports(),
-                "Language_Report.md");
+                "req26_language_report.md");
 
-        /* Example of single-value population queries (optional to print) */
-        System.out.println("World population: " + a.getWorldPopulation());
-        System.out.println("Asia population: " + a.getContinentPopulation(continent));
-        System.out.println("Region population (" + region + "): " + a.getRegionPopulation(region));
-        System.out.println("Country population (" + country + "): " + a.getCountryPopulation(country));
-        System.out.println("District population (" + district + "): " + a.getDistrictPopulation(district));
-        System.out.println("City population (New York): " + a.getCityPopulation("New York"));
 
+/* ------------------------------------------------------------
+                    SINGLE POPULATION REPORTS (6)
+   ------------------------------------------------------------ */
+
+        a.outputSingleValueReport(
+                "World population",
+                a.getWorldPopulation(),
+                "req27_population_world.md"
+        );
+
+        a.outputSingleValueReport(
+                "Population of continent: " + continent,
+                a.getContinentPopulation(continent),
+                "req28_population_continent.md"
+        );
+
+        a.outputSingleValueReport(
+                "Population of region: " + region,
+                a.getRegionPopulation(region),
+                "req29_population_region.md"
+        );
+
+        a.outputSingleValueReport(
+                "Population of country: " + country,
+                a.getCountryPopulation(country),
+                "req30_population_country.md"
+        );
+
+        a.outputSingleValueReport(
+                "Population of district: " + district,
+                a.getDistrictPopulation(district),
+                "req31_population_district.md"
+        );
+
+        a.outputSingleValueReport(
+                "Population of city: New York",
+                a.getCityPopulation("New York"),
+                "req32_population_city.md"
+        );
 
         /* END */
+
+
         a.disconnect();
     }
 }
