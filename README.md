@@ -1,6 +1,6 @@
 # SET09803: DevOps Coursework (Group 22)
 
-## CI/CD & Project Badges
+## Project Badges
 
 ### Main Workflow
 ![Main Workflow](https://github.com/noritateo/devops-22-backup/actions/workflows/main.yml/badge.svg)
@@ -74,49 +74,39 @@ There are 32 requirements in total.
 
 ## Requirements Table
 
-| ID | Requirement | Met | Screenshot |
-|----|------------|-----|------------|
-| 1 | All countries in the world by population | Yes | |
-| 2 | All countries in a continent by population | Yes | |
-| 3 | All countries in a region by population | Yes | |
-| 4 | Top N countries in the world | Yes | |
-| 5 | Top N countries by continent | Yes | |
-| 6 | Top N countries by region | Yes | |
-| 7 | All cities in the world | Yes | |
-| 8 | All cities in a continent | Yes | |
-| 9 | All cities in a region | Yes | |
-| 10 | All cities in a country | Yes | |
-| 11 | All cities in a district | Yes | |
-| 12 | Top N cities in the world | Yes | |
-| 13 | Top N cities in a continent | Yes | |
-| 14 | Top N cities in a region | Yes | |
-| 15 | Top N cities in a country | Yes | |
-| 16 | Top N cities in a district | Yes | |
-| 17 | All capital cities | Yes | |
-| 18 | All capital cities in a continent | Yes | |
-| 19 | All capital cities in a region | Yes | |
-| 20 | Top N capital cities in the world | Yes | |
-| 21 | Top N capital cities in a continent | Yes | |
-| 22 | Top N capital cities in a region | Yes | |
-| 23 | Population of each continent (city vs non-city) | Yes | |
-| 24 | Population of each region | Yes | |
-| 25 | Population of each country | Yes | |
-| 26 | Population of the world | Yes | |
-| 27 | Population of a continent | Yes | |
-| 28 | Population of a region | Yes | |
-| 29 | Population of a country | Yes | |
-| 30 | Population of a district | Yes | |
-| 31 | Population of a city | Yes | |
-| 32 | Language speakers report | Yes | |
+| ID | Requirement                                                                                                      | Met | Screenshot                                           |
+|----|------------------------------------------------------------------------------------------------------------------|-----|------------------------------------------------------|
+| 1  | All the countries in the world organised by largest population to smallest.                                      | Yes | <img src="imgs/req01_countries_world_all.png" width="300"/> |
+| 2  | All the countries in a continent organised by largest population to smallest.                                    | Yes | <img src="imgs/req02_countries_continent_europe_all.png" width="300"/> |
+| 3  | All the countries in a region organised by largest population to smallest.                                       | Yes | <img src="imgs/req03_countries_region_western_europe_all.png" width="300"/> |
+| 4  | The top N populated countries in the world where N is provided by the user.                                      | Yes | <img src="imgs/req04_countries_world_top10.png" width="300"/> |
+| 5  | The top N populated countries in a continent where N is provided by the user.                                    | Yes | <img src="imgs/req05_countries_continent_europe_top10.png" width="300"/> |
+| 6  | The top N populated countries in a region where N is provided by the user.                                       | Yes | <img src="imgs/req06_countries_region_western_europe_top10.png" width="300"/> |
+| 7  | All the cities in the world organised by largest population to smallest.                                         | Yes | <img src="imgs/req07_cities_world_all.png" width="300"/> |
+| 8  | All the cities in a continent organised by largest population to smallest.                                       | Yes | <img src="imgs/req08_cities_continent_europe_all.png" width="300"/> |
+| 9  | All the cities in a region organised by largest population to smallest.                                          | Yes | <img src="imgs/req09_cities_region_western_europe_all.png" width="300"/> |
+| 10 | All the cities in a country organised by largest population to smallest.                                         | Yes | <img src="imgs/req10_cities_country_united_states_all.png" width="300"/> |
+| 11 | All the cities in a district organised by largest population to smallest.                                        | Yes | <img src="imgs/req11_cities_district_california_all.png" width="300"/> |
+| 12 | The top N populated cities in the world where N is provided by the user.                                         | Yes | <img src="imgs/req12_cities_world_top10.png" width="300"/> |
+| 13 | The top N populated cities in a continent where N is provided by the user.                                       | Yes | <img src="imgs/req13_cities_continent_europe_top10.png" width="300"/> |
+| 14 | The top N populated cities in a region where N is provided by the user.                                          | Yes | <img src="imgs/req14_cities_region_western_europe_top10.png" width="300"/> |
+| 15 | The top N populated cities in a country where N is provided by the user.                                         | Yes | <img src="imgs/req15_cities_country_united_states_top10.png" width="300"/> |
+| 16 | The top N populated cities in a district where N is provided by the user.                                        | Yes | <img src="imgs/req16_cities_district_california_top10.png" width="300"/> |
+| 17 | All the capital cities in the world organised by largest population to smallest.                                 | Yes | <img src="imgs/req17_capitals_world_all.png" width="300"/> |
+| 18 | All the capital cities in a continent organised by largest population to smallest.                               | Yes | <img src="imgs/req18_capitals_continent_europe_all.png" width="300"/> |
+| 19 | All the capital cities in a region organised by largest to smallest.                                             | Yes | <img src="imgs/req19_capitals_region_western_europe_all.png" width="300"/> |
+| 20 | The top N populated capital cities in the world where N is provided by the user.                                 | Yes | <img src="imgs/req20_capitals_world_top10.png" width="300"/> |
+| 21 | The top N populated capital cities in a continent where N is provided by the user.                               | Yes | <img src="imgs/req21_capitals_continent_europe_top10.png" width="300"/> |
+| 22 | The top N populated capital cities in a region where N is provided by the user.                                  | Yes | <img src="imgs/req22_capitals_region_western_europe_top10.png" width="300"/> |
+| 23 | Population, city population, and non-city population in each continent.                                          | Yes | <img src="imgs/req23_population_continent_all.png" width="300"/> |
+| 24 | Population, city population, and non-city population in each region.                                             | Yes | <img src="imgs/req24_population_region_all.png" width="300"/> |
+| 25 | Population, city population, and non-city population in each country.                                            | Yes | <img src="imgs/req25_population_country_all.png" width="300"/> |
+| 26 | Speakers of Chinese, English, Hindi, Spanish, Arabic + % of world population.                                    | Yes | <img src="imgs/req26_language_report.png" width="300"/> |
+| 27 | The population of the world.                                                                                      | Yes | <img src="imgs/req27_population_world.png" width="300"/> |
+| 28 | The population of a continent.                                                                                    | Yes | <img src="imgs/req28_population_continent.png" width="300"/> |
+| 29 | The population of a region.                                                                                       | Yes | <img src="imgs/req29_population_region.png" width="300"/> |
+| 30 | The population of a country.                                                                                      | Yes | <img src="imgs/req30_population_country.png" width="300"/> |
+| 31 | The population of a district.                                                                                     | Yes | <img src="imgs/req31_population_district.png" width="300"/> |
+| 32 | The population of a city.                                                                                         | Yes | <img src="imgs/req32_population_city.png" width="300"/> |
 
 ---
-
-# Final Delivery Checklist
-
-- [x] Repository link submitted
-- [x] Badges correctly displayed
-- [x] CI running successfully
-- [x] Code coverage integrated
-- [x] All 32 requirements completed
-- [x] Requirements table with screenshots (to be inserted)
-
